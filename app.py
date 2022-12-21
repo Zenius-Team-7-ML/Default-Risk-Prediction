@@ -2,21 +2,17 @@ import pandas as pd
 import streamlit as st
 import requests
 
-df = pd.read_csv("./data_fix.csv")
-# Age, Sex, ChestPainType, RestingBP, Cholesterol, FastingBS, RestingECG, MaxHR, ExerciseAngina, Oldpeak, ST_Slope, HeartDisease
-# 40, M, ATA, 140, 289, 0, Normal, 172, N, 0, Up, 0
-
+df = pd.read_csv("./datamodel.csv")
 
 def run():
     st.title("Default Risk Prediction")
     Ext2 = st.number_input("Ext Source 2")
     Ext3 = st.number_input("Ext Source 3")
     YearLastPhoneChange = st.number_input("Year Last Phone Change")
-    RegRateCity0 = st.selectbox("Region Rate City 0 ", df.REGION_RATING_CLIENT_W_CITY.unique())
-    RegRateCity1 = st.selectbox("Region Rate City 1", df.REGION_RATING_CLIENT_W_CITY.unique())
+    RegRateCity = st.selectbox("Region Rate City", df.REGION_RATING_CLIENT_W_CITY.unique())
     YearsEmp = st.number_input("Years Employed",format = "%d", step = 1)
     RegRateCli = st.selectbox("Region Rate Client",
-                              df.REGION_RATING_CLIENT.unique())
+                            df.REGION_RATING_CLIENT.unique())
     AmtGd = st.number_input("Amount Good Price", format="%d", step=1)
     AmtBlcMean = st.number_input("Amount Balance Mean")
     AmtCredit = st.number_input("Amt Credit", format="%d", step=1)
@@ -34,32 +30,29 @@ def run():
         "Organization Type", df.ORGANIZATION_TYPE.unique())
     OwnCar = st.selectbox(
         "Own Car", df.FLAG_OWN_CAR.unique())
-
     data = {
-        "Ext2": Ext2,
-        "Ext3": Ext3,
-        "YearLastPhoneChange": YearLastPhoneChange,
-        "RegRateCity0": RegRateCity0,
-        "RegRateCity1": RegRateCity1,
-        "YearsEmp": YearsEmp,
-        "RegRateCli": RegRateCli,
-        "AmtGd": AmtGd,
-        "AmtBlcMean": AmtBlcMean,
-        "AmtCredit": AmtCredit,
-        "DaysBirth": DaysBirth,
-        "FloMaxMode": FloMaxMode,
-        "EdType": EdType,
-        "CodeGen": CodeGen,
-        "IncType": IncType,
-        "OccType": OccType,
-        "OrgType": OrgType,
-        "OwnCar": OwnCar}
-
+        "Ext2": float(Ext2),
+        "Ext3": float(Ext3),
+        "YearLastPhoneChange": float(YearLastPhoneChange),
+        "RegRateCity": int(RegRateCity),
+        "YearsEmp": float(YearsEmp),
+        "RegRateCli": int(RegRateCli),
+        "AmtGd": float(AmtGd),
+        "AmtBlcMean": float(AmtBlcMean),
+        "AmtCredit": float(AmtCredit),
+        "DaysBirth": int(DaysBirth),
+        "FloMaxMode": float(FloMaxMode),
+        "EdType": str(EdType),
+        "CodeGen": str(CodeGen),
+        "IncType": str(IncType),
+        "OccType": str(OccType),
+        "OrgType": str(OrgType),
+        "OwnCar": str(OwnCar)
+        }
     if st.button("Predict"):
-        # response = requests.post(
-        #     "http://ec2-108-137-4-27.ap-southeast-3.compute.amazonaws.com:8090/predict", json=data)
-        # prediction = response.text
-        prediction = 1
+        response = requests.post(
+            "http://ec2-108-137-94-218.ap-southeast-3.compute.amazonaws.com:8090/predict", json=data)
+        prediction = response.text
         if prediction == "0":
             st.caption(f"The prediction from model: {prediction}")
             st.success("The model predict this client is default risk")
